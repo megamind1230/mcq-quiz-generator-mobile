@@ -1,0 +1,29 @@
+---
+title: Fixture Quiz
+source: fix.md
+generated: 2026-08-31 20:00
+---
+
+## Question 1
+What is 2 + 2?
+
+A. 3
+B. 4
+C. 5
+D. 6
+
+**[Answer: B]**
+**Explanation:** Basic arithmetic.
+
+---
+
+## Question 2
+Select the even numbers
+
+A. 2
+B. 3
+C. 4
+D. 5
+
+**[Answer:A,C]**
+**Explanation:** 2 and 4 are even.

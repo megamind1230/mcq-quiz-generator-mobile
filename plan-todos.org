@@ -1,0 +1,64 @@
+#+TITLE: plan-todos.org
+#+DESCRIPTION: Implementation steps for MCQ Quiz (Mobile PWA)
+
+Companion to =mcq-quiz-generator-desktop= -- students take quizzes here.
+
+* Phase 1: Project scaffold                                               [DONE]
+  - [X] Initialize Vite + React + TypeScript project
+  - [X] Add vite-plugin-pwa with workbox precache config
+  - [X] Generate PWA icons (32, 180, 192, 512)
+  - [X] Create =App.tsx= (topbar + theme toggle)
+  - [X] Create =SettingsContext= (localStorage-persisted dark/light/instantFeedback)
+  - [X] Create =types.ts= (McqDocument, McqQuestion, QuizResult, AppSettings)
+
+* Phase 2: Port pure modules from desktop                                 [DONE]
+  - [X] Port =mcqParser.ts= (parse .mcq text -> McqDocument)
+  - [X] Port =renderRichText.ts= (KaTeX + highlight.js rendering)
+  - [X] Port =quizLogger.ts= (localStorage result history)
+  - [X] Port =quizExporter.ts= (buildHtml, buildTxt, buildMd, buildOrg)
+  - [X] Port =shuffle.ts= (Fisher-Yates)
+  - [X] Create =cssAssets.ts= (inline KaTeX + hljs CSS for export)
+  - [X] Write tests: parser (5 tests), exporter (6 tests), shuffle (5 tests)
+
+* Phase 3: WebCrypto decrypt (.emcq)                                      [DONE]
+  - [X] Implement WebCrypto AES-GCM decrypt (SHA-256 derived key)
+  - [X] Header detection: =encrypted-mcq-v1|= prefix
+  - [X] Format: =ivB64:tagB64:dataB64=, decode via atob -> Uint8Array
+  - [X] Unit test: decrypt desktop-generated fixture (interop test)
+  - [X] Unit test: non-encrypted input passes through unchanged
+  - [X] Unit test: malformed payloads return null
+
+* Phase 4: Quiz flow (QuizView)                                           [DONE]
+  - [X] Home screen: hero + "Open Exam" button + history list
+  - [X] File picker: =<input type=file accept=".mcq,.emcq,.txt,.md,.org">=
+  - [X] Decrypt-if-emcq, parse, validate (<=50 questions)
+  - [X] Active quiz: radio/checkbox cards, progress, timer, leave button
+  - [X] Instant feedback (green/red), explanation display
+  - [X] Next/Previous + disable Finish until all answered
+  - [X] Results: score + per-question "Your Answer(s)" / "Correct Answer(s)"
+  - [X] Click-to-copy for rich content (data-copy-id pattern)
+
+* Phase 5: Export + logs                                                  [DONE]
+  - [X] Export PDF: buildHtml + exportAssets -> window.print()
+  - [X] Local history: logQuizResult, loadQuizResults, clearQuizResults
+  - [X] History list on Home screen (reverse chronological)
+
+* Phase 6: PWA polish                                                     [DONE]
+  - [X] vite-plugin-pwa manifest (standalone, theme #7c0aed, icons)
+  - [X] Service worker precache (70 entries, ~2.5MB including KaTeX fonts)
+  - [X] Auto-update registration
+
+* Phase 7: Documentation                                                  [DONE]
+  - [X] README.org (features, structure, tech stack, how-to-use)
+  - [X] plan-todos.org
+  - [X] bugs.org
+  - [X] changelog.org
+  - [X] LICENSE (GPL 3.0)
+
+* Phase 8: Deferred / future                                              [TODO]
+  - [ ] Capacitor wrapper for native APK (enables "Open with..." system menu)
+  - [ ] Native file-open intent (WhatsApp/Telegram link handling)
+  - [ ] Settings screen (expose instantFeedback, shuffle toggles)
+  - [ ] Quiz repeat / retake
+  - [ ] Multi-language support (i18n)
+  - [ ] Haptic feedback on mobile (vibration API)

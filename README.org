@@ -1,0 +1,176 @@
+#+TITLE: README.org
+#+DESCRIPTION: MCQ Quiz (Mobile) - Offline student quiz taker PWA
+
+* MCQ Quiz (Mobile)
+
+A ~100% offline progressive web app (PWA) for *students only*.  It imports
+=.mcq= and =.emcq= quiz files (created by the desktop app
+=mcq-quiz-generator-desktop=), lets students take the quiz, shows a graded
+results page, logs results locally on the device, and can export a PDF.
+
+This app deliberately does *not* generate, encrypt, or author quizzes -- that
+is left to the desktop app.  It only parses and grades.  This keeps it small,
+offline-only, and safe to hand out to students: they never need an account,
+an API key, or network access after first load.
+
+* Screenshots
+  (none yet)
+
+* Features
+
+** Import
+  - "Open Exam" button opens the device file picker
+  - Accepts =.mcq=, =.emcq=, =.txt=, =.md=, =.org= files
+  - =.emcq= files are decrypted in the browser with WebCrypto
+    (AES-256-GCM), using the same key as the desktop app -- no plaintext
+    temp files are ever written
+  - Rejects invalid or empty files; caps at 50 questions
+
+** Quiz
+  - One question at a time with clickable option cards
+    - *Single answer:* radio markers (=●=/=○=), "Single answer" tag
+    - *Multi answer:* checkbox markers (=☑=/=☐=), "Select all that apply"
+      tag and a hint; graded by exact match (all-or-nothing)
+  - Count-up timer
+  - Instant feedback toggle (show correct/wrong on click, or only at results)
+  - Optional options shuffle and question-order shuffle (settings)
+  - Explanation display after each answer
+  - Next / Previous navigation
+  - =← Leave= button (red) with confirm dialog
+  - Can't finish until every question is answered
+
+** Results
+  - Percentage score with color coding (green/orange/red)
+  - Per-question review: *Your Answer(s) ==>* / *Correct Answer(s) ==>* with
+    ✅/❌ (green/red) and full Explanation
+  - Results logged to =localStorage= per device
+  - History list on the Home screen with title, score, time, and date
+  - Clear-all-history option
+
+** Export
+  - =Export PDF= button -- opens a self-contained HTML result page and calls
+    the browser's native "Save as PDF" print dialog (works offline)
+  - KaTeX math and highlighted code render in the exported HTML
+
+** Rich Content
+  - LaTeX math (KaTeX): inline =\$...\$= and display =\$\$...\$\$=
+  - Code syntax highlighting (highlight.js): fenced blocks + inline
+  - Click-to-copy on code/math elements
+
+** Settings
+  Persisted in =localStorage=:
+  | Setting               | Default | Purpose                             |
+  |-----------------------+---------+-------------------------------------|
+  | Theme                 | dark    | Dark / light mode                   |
+  | Instant Feedback      | off     | Show correct/wrong on click         |
+  | Randomize Options     | on      | Shuffle option order each quiz      |
+  | Randomize Q Order     | on      | Shuffle question order each quiz    |
+
+  (Only the theme toggle is exposed in the UI today; the rest retain defaults
+  and are wired for future settings screens.)
+
+** PWA / Offline
+  - Installable: add to Home Screen (standalone display)
+  - Service worker precaches all app assets (KaTeX fonts included) for full
+    offline use
+  - Auto-updates on next load after a deploy
+
+* Prerequisites
+  - Node.js 18+ and npm (only to build/host)
+  - No account, no API key, no backend
+
+* Quick Start
+
+  #+BEGIN_SRC bash
+  cd mcq-quiz-generator-mobile
+  npm install
+  npm run dev            # local dev server
+  npm run build          # production build in dist/
+  #+END_SRC
+
+  To distribute:
+  1. =npm run build=
+  2. Host the =dist/= folder on any static host (GitHub Pages, Netlify, Vercel)
+  3. Send students the URL; they open it once and "Add to Home Screen"
+  4. After first load it works fully offline
+  5. Students download the =.mcq=/=.emcq= file (Telegram, WhatsApp, email, USB)
+     and open it with the in-app *Open Exam* button
+
+* Available Scripts
+
+  | Command             | Description                       |
+  |---------------------+-----------------------------------|
+  | =npm run dev=       | Start development server           |
+  | =npm run build=     | Build production PWA into =dist/=  |
+  | =npm run preview=   | Preview the production build       |
+  | =npm run typecheck= | Type-check app + vite config       |
+  | =npm test=          | Run unit tests (vitest)            |
+
+* Logs
+
+  - Quiz results: =localStorage= (key =quiz-results.json=), per device
+  - Settings: =localStorage= (key =mcq-settings.json=), per device
+  - No server-side logs (fully client-side)
+
+* Tech Stack
+
+  | Layer          | Tech                  | Version |
+  |----------------+-----------------------+---------|
+  | UI framework   | React + TypeScript    | ^19     |
+  | Build tooling  | Vite (react plugin)   | ^5      |
+  | PWA            | vite-plugin-pwa       | ^0.21   |
+  | Math rendering | KaTeX                 | ^0.18   |
+  | Code highlight | highlight.js          | ^11     |
+  | Crypto         | WebCrypto (AES-GCM)   | native  |
+  | Unit tests     | vitest                | ^4      |
+
+* How It Works
+
+  1. *Open:* user taps *Open Exam* and picks a file (or drags onto the picker)
+  2. *Decrypt:* if the file is =.emcq= (or starts with ~encrypted-mcq-v1~),
+     it is decrypted in-browser via WebCrypto AES-GCM with the shared key
+  3. *Parse:* =mcqParser= turns the text into an =McqDocument=
+     (questions + options + =correctIndices=)
+  4. *Shuffle (optional):* options and/or question order are randomized
+  5. *Quiz:* =QuizView= renders one question at a time, records =selectedIndices=
+  6. *Grade:* exact-match set equality per question -> score
+  7. *Log + export:* result saved to =localStorage=; PDF via =buildHtml+
+     =exportAssets= then =window.print()=
+
+* Project Structure
+
+  #+BEGIN_SRC
+  mcq-quiz-generator-mobile/
+  ├── public/
+  │   └── icons/            # PWA icons (32/180/192/512 PNG)
+  ├── src/
+  │   ├── App.tsx                # Root component, topbar + theme toggle
+  │   ├── SettingsContext.tsx    # localStorage settings context
+  │   ├── main.tsx               # Entry: KaTeX/hljs CSS + SettingsProvider
+  │   ├── types.ts               # Shared types (McqDocument, McqQuestion, ...)
+  │   ├── styles.css             # Quiz theme / layout CSS
+  │   ├── components/
+  │   │   └── QuizView.tsx       # Home, OpenExam, active quiz, results, PDF
+  │   ├── lib/
+  │   │   └── crypto.ts          # WebCrypto AES-GCM .emcq decrypt
+  │   ├── utils/
+  │   │   ├── cssAssets.ts       # Inlined KaTeX/hljs CSS for exports
+  │   │   ├── mcqParser.ts       # .mcq text -> McqDocument
+  │   │   ├── quizExporter.ts    # results -> HTML/TXT/MD/Org
+  │   │   ├── quizLogger.ts      # localStorage result history
+  │   │   ├── renderRichText.ts  # KaTeX + highlight.js rendering
+  │   │   └── shuffle.ts         # Fisher-Yates shuffle
+  │   └── __tests__/              # Unit tests + fixture .mcq/.emcq
+  ├── vite.config.ts        # Vite + PWA manifest config
+  ├── tsconfig.json / tsconfig.node.json
+  ├── plan-todos.org        # Implementation plan
+  ├── bugs.org              # Known bugs and fixes
+  ├── changelog.org          # Version history
+  └── README.org
+  #+END_SRC
+
+* Companion Desktop App
+
+  The =mcq-quiz-generator-desktop= sibling project generates, encrypts, and
+  authors =.mcq=/=.emcq= quizzes (with Gemini AI generation).  Share the
+  resulting files with students; this mobile app is how they take them.

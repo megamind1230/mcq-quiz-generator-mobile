@@ -1,0 +1,19 @@
+#+TITLE: changelog.org
+#+DESCRIPTION: Update tracking for MCQ Quiz (Mobile PWA)
+
+Companion project to [[file:../../mcq-quiz-generator-desktop/changelog.org][mcq-quiz-generator-desktop]].
+
+* v0.1.0 - 2026-08-31
+  Initial mobile PWA -- fully offline student quiz taker.
+  - [X] Vite + React 19 + vite-plugin-pwa scaffold
+  - [X] Ported parser, renderRichText, quizLogger, quizExporter, shuffle from desktop
+  - [X] WebCrypto AES-GCM .emcq decrypt (interop-verified against desktop fixtures)
+  - [X] Import via in-app file picker (.mcq, .emcq, .txt, .md, .org)
+  - [X] Quiz UI: radio/checkbox cards, timer, instant feedback, leave button
+  - [X] Results: score, per-question review with Your/Correct Answer(s)
+  - [X] PDF export via window.print() on self-contained HTML
+  - [X] Local quiz history (localStorage) with clear option
+  - [X] SettingsContext (localStorage, dark/light, instantFeedback, shuffle)
+  - [X] PWA: manifest, service worker precache, auto-update, icons
+  - [X] 16 unit tests passing (parser, exporter, crypto interop)
+  - [X] TypeScript typecheck clean (app + vite config)
