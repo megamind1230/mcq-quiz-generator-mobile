@@ -4,11 +4,12 @@
 * Current Bugs
   - [O] No native "Open with..." support.  Students must open the in-app
         file picker manually.  Native intent handling requires Capacitor/APK
-        build (deferred -- see plan-todos.org Phase 8).
-  - [O] No settings UI screen.  Settings (shuffle, instantFeedback) retain
-        defaults; wired in SettingsContext but not exposed in the UI yet.
+        build (deferred -- see plans-and-todos.org Phase 8).
 
 * Fixed Bugs
+  - [X] No settings UI screen.  Settings (shuffle, instantFeedback) retained
+        defaults; wired in SettingsContext but not exposed in the UI yet.
+        Fixed in v0.2.0 -- SettingsPanel component with gear button in topbar.
   - [X] TS2322 in crypto.ts decryptMcqPayload (v0.1.0) -- params typed
         =Uint8Array= (ArrayBufferLike) failed BufferSource check.  Fixed by
         typing params as =Uint8Array<ArrayBuffer>=.

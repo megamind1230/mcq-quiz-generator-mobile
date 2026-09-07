@@ -1,4 +1,4 @@
-#+TITLE: plan-todos.org
+#+TITLE: plans-and-todos.org
 #+DESCRIPTION: Implementation steps for MCQ Quiz (Mobile PWA)
 
 Companion to =mcq-quiz-generator-desktop= -- students take quizzes here.
@@ -50,7 +50,7 @@ Companion to =mcq-quiz-generator-desktop= -- students take quizzes here.
 
 * Phase 7: Documentation                                                  [DONE]
   - [X] README.org (features, structure, tech stack, how-to-use)
-  - [X] plan-todos.org
+  - [X] plans-and-todos.org
   - [X] bugs.org
   - [X] changelog.org
   - [X] LICENSE (GPL 3.0)
@@ -58,7 +58,16 @@ Companion to =mcq-quiz-generator-desktop= -- students take quizzes here.
 * Phase 8: Deferred / future                                              [TODO]
   - [ ] Capacitor wrapper for native APK (enables "Open with..." system menu)
   - [ ] Native file-open intent (WhatsApp/Telegram link handling)
-  - [ ] Settings screen (expose instantFeedback, shuffle toggles)
-  - [ ] Quiz repeat / retake
+  - [X] Settings screen (expose instantFeedback, shuffle toggles) -- v0.2.0
+  - [X] Quiz repeat / retake -- v0.2.0 (Loop Mode)
   - [ ] Multi-language support (i18n)
   - [ ] Haptic feedback on mobile (vibration API)
+
+* Phase 9: Loop mode + settings + keyboard shortcuts                       [DONE]
+  - [X] Loop mode: retakes wrong answers in batches of 15 until all mastered
+  - [X] Mode picker overlay: Loop vs Normal, shown after selecting a file
+  - [X] Extracted =quizModes.ts= (grading + loop logic) + unit tests
+  - [X] Settings panel: gear button in topbar, modal with all toggles
+  - [X] Keyboard shortcuts: a/b/c/d, n/p, j/k, Esc/q
+  - [X] Last opened file name hint on home screen
+  - [X] Renamed =plan-todos.org= -> =plans-and-todos.org=

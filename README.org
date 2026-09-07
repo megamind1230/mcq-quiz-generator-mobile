@@ -25,19 +25,26 @@ an API key, or network access after first load.
     (AES-256-GCM), using the same key as the desktop app -- no plaintext
     temp files are ever written
   - Rejects invalid or empty files; caps at 50 questions
+  - Remembers and displays the last opened file name on the home screen
 
 ** Quiz
   - One question at a time with clickable option cards
     - *Single answer:* radio markers (=●=/=○=), "Single answer" tag
     - *Multi answer:* checkbox markers (=☑=/=☐=), "Select all that apply"
       tag and a hint; graded by exact match (all-or-nothing)
+  - *Mode picker:* after selecting a file, choose *Loop Mode* (retakes wrong
+    answers in batches of 15 until all mastered; instant feedback forced on;
+    no results page) or *Normal Mode* (standard quiz with results page)
   - Count-up timer
-  - Instant feedback toggle (show correct/wrong on click, or only at results)
+  - Instant feedback toggle (show correct/wrong on click, or only at results;
+    forced on in Loop Mode)
   - Optional options shuffle and question-order shuffle (settings)
   - Explanation display after each answer
   - Next / Previous navigation
   - =← Leave= button (red) with confirm dialog
   - Can't finish until every question is answered
+  - Keyboard shortcuts: =a= =b= =c= =d= (select), =n= =p= (next/prev),
+    =j= =k= (scroll), =Esc= / =q= (leave)
 
 ** Results
   - Percentage score with color coding (green/orange/red)
@@ -57,17 +64,68 @@ an API key, or network access after first load.
   - Code syntax highlighting (highlight.js): fenced blocks + inline
   - Click-to-copy on code/math elements
 
+** Example
+
+  #+BEGIN_SRC markdown
+  ---
+  title: Physics Quiz
+  source: physics.md
+  generated: 2026-08-01 10:00
+  ---
+
+  ## Question 1
+  What is the integral of $f(x) = 3x^2$ from 0 to 1?
+
+  A. 0
+  B. 1
+  C. 2
+  D. 3
+
+  **[Answer: B]**
+  **Explanation:** $\int_0^1 3x^2\,dx = \left[x^3\right]_0^1 = 1$.
+
+  ---
+
+  ## Question 2
+  What does this Python function return?
+
+  ```python
+  def fib(n):
+      if n <= 1:
+          return n
+      return fib(n - 1) + fib(n - 2)
+  ```
+
+  A. The sum of 1 to n
+  B. The nth Fibonacci number
+  C. The factorial of n
+  D. The nth prime number
+
+  **[Answer: B]**
+  **Explanation:** =fib(n)= recursively computes Fibonacci numbers: =fib(0)=0=, =fib(1)=1=, =fib(n)=fib(n-1)+fib(n-2)=.
+
+  ---
+
+  ## Question 3
+  Which of the following are prime numbers?
+
+  A. 7
+  B. 9
+  C. 13
+  D. 15
+
+  **[Answer:A,C]**
+  **Explanation:** 7 and 13 are prime. 9 = 3x3 and 15 = 3x5 are composite.
+  #+END_SRC
+
 ** Settings
-  Persisted in =localStorage=:
+  Persisted in =localStorage=, accessible via the gear button in the topbar:
   | Setting               | Default | Purpose                             |
   |-----------------------+---------+-------------------------------------|
   | Theme                 | dark    | Dark / light mode                   |
-  | Instant Feedback      | off     | Show correct/wrong on click         |
+  | Instant Feedback      | off     | Show correct/wrong on click (forced on in Loop Mode) |
   | Randomize Options     | on      | Shuffle option order each quiz      |
   | Randomize Q Order     | on      | Shuffle question order each quiz    |
-
-  (Only the theme toggle is exposed in the UI today; the rest retain defaults
-  and are wired for future settings screens.)
 
 ** PWA / Offline
   - Installable: add to Home Screen (standalone display)
@@ -144,18 +202,20 @@ an API key, or network access after first load.
   ├── public/
   │   └── icons/            # PWA icons (32/180/192/512 PNG)
   ├── src/
-  │   ├── App.tsx                # Root component, topbar + theme toggle
+  │   ├── App.tsx                # Root component, topbar + theme toggle + gear
   │   ├── SettingsContext.tsx    # localStorage settings context
   │   ├── main.tsx               # Entry: KaTeX/hljs CSS + SettingsProvider
   │   ├── types.ts               # Shared types (McqDocument, McqQuestion, ...)
   │   ├── styles.css             # Quiz theme / layout CSS
   │   ├── components/
-  │   │   └── QuizView.tsx       # Home, OpenExam, active quiz, results, PDF
+  │   │   ├── QuizView.tsx       # Home, OpenExam, active quiz, results, PDF
+  │   │   └── SettingsPanel.tsx  # Settings modal (gear button overlay)
   │   ├── lib/
   │   │   └── crypto.ts          # WebCrypto AES-GCM .emcq decrypt
   │   ├── utils/
   │   │   ├── cssAssets.ts       # Inlined KaTeX/hljs CSS for exports
   │   │   ├── mcqParser.ts       # .mcq text -> McqDocument
+  │   │   ├── quizModes.ts      # Loop mode logic + grading
   │   │   ├── quizExporter.ts    # results -> HTML/TXT/MD/Org
   │   │   ├── quizLogger.ts      # localStorage result history
   │   │   ├── renderRichText.ts  # KaTeX + highlight.js rendering
@@ -163,7 +223,7 @@ an API key, or network access after first load.
   │   └── __tests__/              # Unit tests + fixture .mcq/.emcq
   ├── vite.config.ts        # Vite + PWA manifest config
   ├── tsconfig.json / tsconfig.node.json
-  ├── plan-todos.org        # Implementation plan
+  ├── plans-and-todos.org    # Implementation plan
   ├── bugs.org              # Known bugs and fixes
   ├── changelog.org          # Version history
   └── README.org

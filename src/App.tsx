@@ -1,8 +1,11 @@
+import { useState } from 'react'
 import QuizView from './components/QuizView'
+import SettingsPanel from './components/SettingsPanel'
 import { useSettings } from './SettingsContext'
 
 function App() {
   const { settings, update } = useSettings()
+  const [settingsOpen, setSettingsOpen] = useState(false)
 
   return (
     <div className="app">
@@ -16,11 +19,19 @@ function App() {
           >
             {settings.theme === 'dark' ? '☀️' : '🌙'}
           </button>
+          <button
+            className="settings-toggle"
+            onClick={() => setSettingsOpen(true)}
+            title="Settings"
+          >
+            ⚙️
+          </button>
         </div>
       </header>
       <main className="content">
         <QuizView />
       </main>
+      <SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)} />
     </div>
   )
 }

@@ -3,6 +3,20 @@
 
 Companion project to [[file:../../mcq-quiz-generator-desktop/changelog.org][mcq-quiz-generator-desktop]].
 
+* v0.2.0 - 2026-09-08
+  Loop mode, settings panel, keyboard shortcuts, quality-of-life.
+  - [X] *Loop mode:* retakes wrong answers in batches of 15 until all mastered;
+        instant feedback forced on; no results page
+  - [X] *Mode picker overlay:* choose Loop or Normal mode before each quiz
+  - [X] *Settings panel:* gear button in topbar opens modal with Instant Feedback,
+        Randomize Options, Randomize Question Order toggles
+  - [X] *Keyboard shortcuts:* a/b/c/d (select), n/p (next/prev), j/k (scroll),
+        Esc/q (leave) -- for students on laptop/PC
+  - [X] *Last opened file hint:* shows filename of last opened exam on home screen
+  - [X] Extracted =quizModes.ts= (grading + loop logic) + unit tests (23 total)
+  - [X] Renamed =plan-todos.org= -> =plans-and-todos.org=
+  - [X] README.org updated: rich .mcq examples (LaTeX, code), new features documented
+
 * v0.1.0 - 2026-08-31
   Initial mobile PWA -- fully offline student quiz taker.
   - [X] Vite + React 19 + vite-plugin-pwa scaffold
