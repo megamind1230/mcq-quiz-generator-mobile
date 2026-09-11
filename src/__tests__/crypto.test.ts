@@ -1,6 +1,6 @@
 import { readFileSync } from 'fs'
 import { describe, it, expect } from 'vitest'
-import { decryptMcq, isEncrypted } from '../lib/crypto'
+import { decryptMcq, encryptMcq, isEncrypted } from '../lib/crypto'
 
 // Fixture encrypted by the desktop app (Node crypto, AES-256-GCM, same key).
 const emcq = readFileSync(new URL('./fixtures/sample.emcq', import.meta.url), 'utf-8')
@@ -24,5 +24,26 @@ describe('crypto (mobile WebCrypto interop)', () => {
   it('returns null for malformed encrypted payloads', async () => {
     expect(await decryptMcq('encrypted-mcq-v1|bad')).toBeNull()
     expect(await decryptMcq('encrypted-mcq-v1|!@#:$$:%%')).toBeNull()
+  })
+})
+
+describe('encryptMcq', () => {
+  it('round-trips encrypted content', async () => {
+    const encrypted = await encryptMcq(plain)
+    expect(encrypted).not.toBe(plain)
+    expect(isEncrypted(encrypted)).toBe(true)
+    expect(await decryptMcq(encrypted)).toBe(plain)
+  })
+
+  it('produces unique ciphertext per call (random IV)', async () => {
+    const a = await encryptMcq('same input')
+    const b = await encryptMcq('same input')
+    expect(a).not.toBe(b)
+  })
+
+  it('desktop can decrypt mobile-encrypted output', async () => {
+    const encrypted = await encryptMcq(plain)
+    const decrypted = await decryptMcq(encrypted)
+    expect(decrypted).toBe(plain)
   })
 })

@@ -6,7 +6,7 @@ import { renderRichText, getRawContent, clearRawContentMap } from '../utils/rend
 import { shuffle } from '../utils/shuffle'
 import { buildHtml, type ExportData, type ExportFormat } from '../utils/quizExporter'
 import { exportAssets } from '../utils/cssAssets'
-import { decryptMcq, isEncrypted } from '../lib/crypto'
+import { decryptMcq, encryptMcq, isEncrypted } from '../lib/crypto'
 import { advanceLoop, BLOCK_SIZE, exactMatch, isAnswered, type QuizMode } from '../utils/quizModes'
 import { formatTime, LABELS } from '../utils/format'
 import type { McqDocument, McqQuestion, QuizResult } from '../types'
@@ -29,6 +29,10 @@ export default function QuizView() {
   const [error, setError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [lastDir, setLastDir] = useState<string | null>(() => localStorage.getItem('mcq-last-open'))
+  const bulkFileInputRef = useRef<HTMLInputElement>(null)
+  const [bulkRunning, setBulkRunning] = useState(false)
+  const [bulkProgress, setBulkProgress] = useState<string | null>(null)
+  const [bulkResult, setBulkResult] = useState<string | null>(null)
 
   useEffect(() => {
     setHistory(loadQuizResults())
@@ -207,6 +211,46 @@ export default function QuizView() {
     }
   }
 
+  // ── Bulk encrypt .mcq → .emcq ──────────────────────────────
+  const handleBulkEncrypt = async (files: FileList) => {
+    const mcqFiles = Array.from(files).filter(f => f.name.toLowerCase().endsWith('.mcq'))
+    if (mcqFiles.length === 0) {
+      setBulkResult('No .mcq files selected.')
+      return
+    }
+
+    setBulkRunning(true)
+    setBulkResult(null)
+    let encrypted = 0
+    let failed = 0
+
+    for (let i = 0; i < mcqFiles.length; i++) {
+      setBulkProgress(`Encrypting ${i + 1} of ${mcqFiles.length}...`)
+      try {
+        const text = await mcqFiles[i].text()
+        const emcqContent = await encryptMcq(text)
+        const baseName = mcqFiles[i].name.replace(/\.mcq$/i, '')
+        const blob = new Blob([emcqContent], { type: 'application/octet-stream' })
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `${baseName}.emcq`
+        a.click()
+        URL.revokeObjectURL(url)
+        encrypted++
+      } catch {
+        failed++
+      }
+    }
+
+    setBulkRunning(false)
+    setBulkProgress(null)
+    const parts = []
+    if (encrypted > 0) parts.push(`Encrypted ${encrypted} file${encrypted !== 1 ? 's' : ''}`)
+    if (failed > 0) parts.push(`${failed} failed`)
+    setBulkResult(parts.join(', '))
+  }
+
   // Copy handler for rich content
   useEffect(() => {
     if (state !== 'active') return
@@ -292,6 +336,30 @@ export default function QuizView() {
         </button>
         {lastDir && <div className="last-open-hint">Last opened: {lastDir}</div>}
         {error && <div className="error">{error}</div>}
+
+        <div className="encrypt-section">
+          <input
+            ref={bulkFileInputRef}
+            type="file"
+            multiple
+            accept=".mcq"
+            style={{ display: 'none' }}
+            onChange={e => {
+              const f = e.target.files
+              if (f && f.length > 0) handleBulkEncrypt(f)
+              e.target.value = ''
+            }}
+          />
+          <button
+            className="encrypt-btn"
+            disabled={bulkRunning}
+            onClick={() => bulkFileInputRef.current?.click()}
+          >
+            {bulkRunning ? 'Encrypting...' : 'Bulk Encrypt .mcq → .emcq'}
+          </button>
+          {bulkProgress && <div className="bulk-progress">{bulkProgress}</div>}
+          {bulkResult && <div className="bulk-result">{bulkResult}</div>}
+        </div>
 
         <div className="history">
           <div className="history-head">

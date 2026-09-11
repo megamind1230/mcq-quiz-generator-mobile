@@ -163,6 +163,43 @@ body {
   font-size: 14px;
 }
 
+.encrypt-section {
+  margin-top: 16px;
+}
+
+.encrypt-btn {
+  padding: 10px 20px;
+  background: transparent;
+  color: var(--accent);
+  border: 2px solid var(--accent);
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.encrypt-btn:active {
+  background: var(--accent);
+  color: #fff;
+}
+
+.encrypt-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.bulk-progress {
+  color: var(--text-dim);
+  font-size: 13px;
+  margin-top: 8px;
+}
+
+.bulk-result {
+  color: var(--success);
+  font-size: 13px;
+  margin-top: 8px;
+}
+
 .history {
   margin-top: 32px;
   text-align: left;
