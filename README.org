@@ -1,4 +1,3 @@
-#+TITLE: README.org
 #+DESCRIPTION: MCQ Quiz (Mobile) - Offline student quiz taker PWA
 
 * MCQ Quiz (Mobile)
@@ -12,6 +11,9 @@ This app deliberately does *not* generate, encrypt, or author quizzes -- that
 is left to the desktop app.  It only parses and grades.  This keeps it small,
 offline-only, and safe to hand out to students: they never need an account,
 an API key, or network access after first load.
+
+* Live Demo
+  https://megamind1230.github.io/mcq-quiz-generator-mobile/
 
 * Screenshots
   (none yet)
