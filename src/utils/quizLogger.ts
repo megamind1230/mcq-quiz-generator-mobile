@@ -15,7 +15,3 @@ export function loadQuizResults(): QuizResult[] {
   } catch { /* ignore */ }
   return []
 }
-
-export function clearQuizResults(): void {
-  localStorage.removeItem(RESULTS_FILE)
-}

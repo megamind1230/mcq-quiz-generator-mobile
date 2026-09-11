@@ -1,22 +1,17 @@
 import { useEffect, useRef, useState } from 'react'
 import { useSettings } from '../SettingsContext'
 import { parseMcqFile } from '../utils/mcqParser'
-import { logQuizResult, loadQuizResults, clearQuizResults } from '../utils/quizLogger'
+import { logQuizResult, loadQuizResults } from '../utils/quizLogger'
 import { renderRichText, getRawContent, clearRawContentMap } from '../utils/renderRichText'
 import { shuffle } from '../utils/shuffle'
 import { buildHtml, type ExportData, type ExportFormat } from '../utils/quizExporter'
 import { exportAssets } from '../utils/cssAssets'
 import { decryptMcq, isEncrypted } from '../lib/crypto'
 import { advanceLoop, BLOCK_SIZE, exactMatch, isAnswered, type QuizMode } from '../utils/quizModes'
+import { formatTime, LABELS } from '../utils/format'
 import type { McqDocument, McqQuestion, QuizResult } from '../types'
 
 type QuizState = 'home' | 'active' | 'results'
-
-function formatTime(seconds: number): string {
-  const m = Math.floor(seconds / 60)
-  const s = seconds % 60
-  return `${m}:${s.toString().padStart(2, '0')}`
-}
 
 export default function QuizView() {
   const { settings } = useSettings()
@@ -25,7 +20,7 @@ export default function QuizView() {
   const [pendingDoc, setPendingDoc] = useState<McqDocument | null>(null)
   const [currentIdx, setCurrentIdx] = useState(0)
   const [questions, setQuestions] = useState<McqQuestion[]>([])
-  const [loop, setLoop] = useState(false)
+  const [mode, setMode] = useState<QuizMode>('classic')
   const [pool, setPool] = useState<McqQuestion[]>([])
   const [mastered, setMastered] = useState(false)
   const [elapsed, setElapsed] = useState(0)
@@ -101,7 +96,7 @@ export default function QuizView() {
     })
     if (settings.randomizeQuestionOrder) qs = shuffle(qs)
 
-    setLoop(mode === 'loop')
+    setMode(mode)
     setMastered(false)
     const cleared = qs.map(q => ({ ...q, selectedIndices: undefined }))
     if (mode === 'loop') {
@@ -130,6 +125,8 @@ export default function QuizView() {
   }
 
   const selectAnswer = (optIdx: number) => {
+    const locked = (mode === 'loop' || mode === 'instant') && isAnswered(questions[currentIdx])
+    if (locked) return
     setQuestions(prev => {
       const next = [...prev]
       const cur = next[currentIdx]
@@ -299,16 +296,6 @@ export default function QuizView() {
         <div className="history">
           <div className="history-head">
             <h2>History</h2>
-            {history.length > 0 && (
-              <button className="clear-btn" onClick={() => {
-                if (confirm('Clear all results?')) {
-                  clearQuizResults()
-                  setHistory([])
-                }
-              }}>
-                Clear
-              </button>
-            )}
           </div>
           {history.length === 0 ? (
             <p className="empty">No results yet.</p>
@@ -335,11 +322,15 @@ export default function QuizView() {
               <h2>Choose a mode</h2>
               <button className="mode-btn" onClick={() => pickMode('loop')}>
                 <strong>Loop Mode</strong>
-                <span>Instant feedback on · retakes wrong answers until mastered · no results page</span>
+                <span>Instant feedback · retakes wrong answers every 15 questions · no results page</span>
               </button>
-              <button className="mode-btn" onClick={() => pickMode('normal')}>
-                <strong>Normal Mode</strong>
-                <span>Feedback as set in settings · results page at the end</span>
+              <button className="mode-btn" onClick={() => pickMode('instant')}>
+                <strong>Instant Mode</strong>
+                <span>Instant feedback on every answer · no results page</span>
+              </button>
+              <button className="mode-btn" onClick={() => pickMode('classic')}>
+                <strong>Classic Mode</strong>
+                <span>No instant feedback · results summary at the end</span>
               </button>
               <button className="mode-cancel" onClick={() => setPendingDoc(null)}>Cancel</button>
             </div>
@@ -352,10 +343,9 @@ export default function QuizView() {
   // ── Active quiz ──────────────────────────────────────────────
   if (state === 'active' && doc) {
     const q = questions[currentIdx]
-    const instant = settings.instantFeedback || loop
+    const instant = mode === 'loop' || mode === 'instant'
     const answered = isAnswered(q)
     const allAnswered = questions.every(isAnswered)
-    const labels = ['A', 'B', 'C', 'D']
     const multi = q.multiAnswer
     const remaining = Math.max(0, pool.length - questions.length)
 
@@ -365,14 +355,15 @@ export default function QuizView() {
           <button className="leave-btn" onClick={leaveQuiz}>← Leave</button>
           <span className="quiz-progress">
             Question {currentIdx + 1} of {questions.length}
-            {loop && ` · ${remaining} left`}
+            {mode === 'loop' && ` · ${remaining} left`}
           </span>
           <span className="quiz-timer">{formatTime(elapsed)}</span>
         </div>
 
         <div className="quiz-meta">
           {multi ? <span className="tag tag-multi">Select all that apply</span> : <span className="tag tag-single">Single answer</span>}
-          {loop && <span className="tag tag-loop">Loop</span>}
+          {mode === 'loop' && <span className="tag tag-loop">Loop</span>}
+          {mode === 'instant' && <span className="tag tag-instant">Instant</span>}
         </div>
 
         <div className="quiz-question" dangerouslySetInnerHTML={{ __html: renderRichText(q.question) }} />
@@ -389,9 +380,9 @@ export default function QuizView() {
               cls += ' selected'
             }
             return (
-              <button key={i} className={cls} onClick={() => selectAnswer(i)}>
+              <button key={i} className={cls} onClick={() => selectAnswer(i)} disabled={instant && answered}>
                 <span className="marker">{multi ? (isSelected ? '☑' : '☐') : (isSelected ? '●' : '○')}</span>
-                <span className="label">{labels[i]}.</span>{' '}
+                <span className="label">{LABELS[i]}.</span>{' '}
                 <span dangerouslySetInnerHTML={{ __html: renderRichText(opt) }} />
               </button>
             )
@@ -408,8 +399,10 @@ export default function QuizView() {
         <div className="quiz-nav">
           <button className="secondary" onClick={goPrev} disabled={currentIdx === 0}>Previous</button>
           {currentIdx === questions.length - 1 ? (
-            loop ? (
+            mode === 'loop' ? (
               <button disabled={!allAnswered} onClick={advanceLoopNow}>Continue</button>
+            ) : mode === 'instant' ? (
+              <button disabled={!allAnswered} onClick={() => { stopTimer(); clearRawContentMap(); setState('home') }}>Finish</button>
             ) : (
               <button disabled={!allAnswered} onClick={finishQuiz}>See Results</button>
             )
@@ -444,10 +437,9 @@ export default function QuizView() {
 
         <div className="results-breakdown">
           {questions.map((q, i) => {
-            const labels = ['A', 'B', 'C', 'D']
             const right = exactMatch(q)
-            const selectedTxt = q.selectedIndices ? q.selectedIndices.map(i => labels[i]).join(', ') : ''
-            const answerTxt = q.correctIndices.map(i => labels[i]).join(', ')
+            const selectedTxt = q.selectedIndices ? q.selectedIndices.map(i => LABELS[i]).join(', ') : ''
+            const answerTxt = q.correctIndices.map(i => LABELS[i]).join(', ')
             const marker = right ? '✅' : '❌'
             const markerColor = right ? 'var(--success)' : 'var(--error)'
             return (

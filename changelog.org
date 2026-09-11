@@ -3,6 +3,21 @@
 
 Companion project to [[file:../../mcq-quiz-generator-desktop/changelog.org][mcq-quiz-generator-desktop]].
 
+* v0.3.0 - 2026-09-11
+  Three quiz modes, answer locking, code refactoring.
+  - [X] *Three quiz modes:* Loop (retakes wrong answers, instant feedback),
+        Instant (instant feedback, no loop), Classic (deferred feedback, results page)
+  - [X] *Removed instantFeedback setting:* feedback behavior now determined by mode
+  - [X] *Answer locking:* in Loop and Instant modes, option buttons are disabled
+        after answering to prevent cheating
+  - [X] *Code refactoring:* extracted =format.ts= (shared =formatTime=, =escapeHtml=,
+        =LABELS=), deduped =exactMatch= via =Matchable= interface, removed dead code
+        from mcqParser/main.tsx/quizExporter
+  - [X] *CSS fixes:* added =.topbar-actions=, replaced hardcoded colors with CSS
+        variables, removed =!important= specificity hack, added =.tag-instant= class
+  - [X] *Removed Clear button* from history section
+  - [X] README.org, plans-and-todos.org, changelog.org updated
+
 * v0.2.0 - 2026-09-08
   Loop mode, settings panel, keyboard shortcuts, quality-of-life.
   - [X] *Loop mode:* retakes wrong answers in batches of 15 until all mastered;

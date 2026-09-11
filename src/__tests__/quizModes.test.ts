@@ -22,8 +22,8 @@ describe('quizModes', () => {
     expect(exactMatch({ ...q(1), selectedIndices: [0] })).toBe(true)
     expect(exactMatch({ ...q(1, 1), selectedIndices: [0] })).toBe(false)
     expect(exactMatch(q(1))).toBe(false)
-    expect(exactMatch({ ...q(2), correctIndices: [0, 1], selectedIndices: [1, 0], multiAnswer: true })).toBe(true)
-    expect(exactMatch({ ...q(2), correctIndices: [0, 1], selectedIndices: [0], multiAnswer: true })).toBe(false)
+    expect(exactMatch({ ...q(2), correctIndices: [0, 1], selectedIndices: [1, 0], multiAnswer: true } as McqQuestion)).toBe(true)
+    expect(exactMatch({ ...q(2), correctIndices: [0, 1], selectedIndices: [0], multiAnswer: true } as McqQuestion)).toBe(false)
   })
 
   it('isAnswered is false until a selection exists', () => {

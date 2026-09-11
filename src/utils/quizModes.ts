@@ -1,9 +1,14 @@
 import type { McqQuestion } from '../types'
 
 export const BLOCK_SIZE = 15
-export type QuizMode = 'loop' | 'normal'
+export type QuizMode = 'loop' | 'instant' | 'classic'
 
-export function exactMatch(q: McqQuestion): boolean {
+export interface Matchable {
+  selectedIndices?: number[]
+  correctIndices: number[]
+}
+
+export function exactMatch(q: Matchable): boolean {
   if (!q.selectedIndices || q.selectedIndices.length === 0) return false
   const a = [...q.selectedIndices].sort().join(',')
   const b = [...q.correctIndices].sort().join(',')

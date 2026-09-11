@@ -1,12 +1,9 @@
 import katex from 'katex'
 import hljs from 'highlight.js'
+import { escapeHtml } from './format'
 
 const rawContentMap = new Map<string, string>()
 let uid = 0
-
-function escapeHtml(s: string): string {
-  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-}
 
 function renderLatex(tex: string, display: boolean): string {
   try {

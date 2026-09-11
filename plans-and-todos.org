@@ -8,7 +8,7 @@ Companion to =mcq-quiz-generator-desktop= -- students take quizzes here.
   - [X] Add vite-plugin-pwa with workbox precache config
   - [X] Generate PWA icons (32, 180, 192, 512)
   - [X] Create =App.tsx= (topbar + theme toggle)
-  - [X] Create =SettingsContext= (localStorage-persisted dark/light/instantFeedback)
+  - [X] Create =SettingsContext= (localStorage-persisted dark/light theme)
   - [X] Create =types.ts= (McqDocument, McqQuestion, QuizResult, AppSettings)
 
 * Phase 2: Port pure modules from desktop                                 [DONE]
@@ -58,16 +58,28 @@ Companion to =mcq-quiz-generator-desktop= -- students take quizzes here.
 * Phase 8: Deferred / future                                              [TODO]
   - [ ] Capacitor wrapper for native APK (enables "Open with..." system menu)
   - [ ] Native file-open intent (WhatsApp/Telegram link handling)
-  - [X] Settings screen (expose instantFeedback, shuffle toggles) -- v0.2.0
+  - [X] Settings screen (expose shuffle toggles) -- v0.2.0
   - [X] Quiz repeat / retake -- v0.2.0 (Loop Mode)
+  - [X] Three quiz modes: Loop, Instant, Classic -- v0.3.0
+  - [X] Answer locking in Loop/Instant modes (anti-cheat) -- v0.3.0
   - [ ] Multi-language support (i18n)
   - [ ] Haptic feedback on mobile (vibration API)
 
 * Phase 9: Loop mode + settings + keyboard shortcuts                       [DONE]
   - [X] Loop mode: retakes wrong answers in batches of 15 until all mastered
-  - [X] Mode picker overlay: Loop vs Normal, shown after selecting a file
+  - [X] Mode picker overlay: Loop vs Instant vs Classic, shown after selecting a file
   - [X] Extracted =quizModes.ts= (grading + loop logic) + unit tests
   - [X] Settings panel: gear button in topbar, modal with all toggles
   - [X] Keyboard shortcuts: a/b/c/d, n/p, j/k, Esc/q
   - [X] Last opened file name hint on home screen
   - [X] Renamed =plan-todos.org= -> =plans-and-todos.org=
+
+* Phase 10: Refactoring + v0.3.0                                      [DONE]
+  - [X] Three quiz modes: Loop, Instant, Classic (replaced Loop/Normal + instantFeedback toggle)
+  - [X] Removed =instantFeedback= from =AppSettings= (now determined by mode)
+  - [X] Answer locking in Loop/Instant modes (disabled option buttons after answering)
+  - [X] Extracted =format.ts= (shared =formatTime=, =escapeHtml=, =LABELS=)
+  - [X] Deduped =exactMatch= (quizExporter imports from quizModes via =Matchable= interface)
+  - [X] CSS fixes: added =.topbar-actions=, hardcoded colors -> CSS variables, removed =!important= hack
+  - [X] Added =.tag-instant= class (was reusing =tag-loop=)
+  - [X] Dead code removal: mcqParser unreachable branch, main.tsx React import, quizExporter EXTENSIONS record

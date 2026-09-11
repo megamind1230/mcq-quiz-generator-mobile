@@ -13,18 +13,6 @@ export default function SettingsPanel({ open, onClose }: { open: boolean; onClos
         </div>
 
         <label className="setting-row">
-          <span>
-            Instant Answer Feedback
-            <small>Shows correct/wrong right after answering. Forced on in Loop Mode.</small>
-          </span>
-          <input
-            type="checkbox"
-            checked={settings.instantFeedback}
-            onChange={e => update({ instantFeedback: e.target.checked })}
-          />
-        </label>
-
-        <label className="setting-row">
           <span>Randomize answer order</span>
           <input
             type="checkbox"

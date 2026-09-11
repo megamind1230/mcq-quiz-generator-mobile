@@ -1,4 +1,6 @@
 import { renderRichText } from './renderRichText'
+import { exactMatch } from './quizModes'
+import { formatTime, escapeHtml, LABELS } from './format'
 
 export type ExportFormat = 'txt' | 'md' | 'org' | 'html' | 'pdf'
 
@@ -17,12 +19,8 @@ export function buildExport(format: ExportFormat, data: ExportData, css?: Export
   }
 }
 
-const EXTENSIONS: Record<ExportFormat, string> = {
-  txt: 'txt', md: 'md', org: 'org', html: 'html', pdf: 'pdf'
-}
-
 export function formatExtension(format: ExportFormat): string {
-  return EXTENSIONS[format]
+  return format
 }
 
 export interface ExportQuestion {
@@ -41,15 +39,6 @@ export interface ExportData {
   questions: ExportQuestion[]
 }
 
-const LABELS = ['A', 'B', 'C', 'D']
-
-function exactMatch(q: ExportQuestion): boolean {
-  if (!q.selectedIndices || q.selectedIndices.length === 0) return false
-  const a = [...q.selectedIndices].sort().join(',')
-  const b = [...q.correctIndices].sort().join(',')
-  return a === b
-}
-
 function statusOf(q: ExportQuestion): { label: string; correct: boolean } {
   if (!q.selectedIndices || q.selectedIndices.length === 0) return { label: 'Skipped', correct: false }
   const ok = exactMatch(q)
@@ -58,12 +47,6 @@ function statusOf(q: ExportQuestion): { label: string; correct: boolean } {
 
 function letters(indices: number[]): string {
   return indices.map(i => LABELS[i]).join(', ')
-}
-
-function fmtTime(seconds: number): string {
-  const m = Math.floor(seconds / 60)
-  const s = seconds % 60
-  return `${m}:${s.toString().padStart(2, '0')}`
 }
 
 function percent(data: ExportData): number {
@@ -84,7 +67,7 @@ export function buildTxt(data: ExportData): string {
   lines.push('='.repeat(data.title.length))
   lines.push('')
   lines.push(`Score: ${data.correct}/${data.total} (${percent(data)}%)`)
-  lines.push(`Time taken: ${fmtTime(data.timeTakenSeconds)}`)
+  lines.push(`Time taken: ${formatTime(data.timeTakenSeconds)}`)
   lines.push('')
   data.questions.forEach((q, i) => {
     const st = statusOf(q)
@@ -108,7 +91,7 @@ export function buildMd(data: ExportData): string {
   lines.push('')
   lines.push(`**Score:** ${data.correct}/${data.total} (${percent(data)}%)`)
   lines.push('')
-  lines.push(`**Time taken:** ${fmtTime(data.timeTakenSeconds)}`)
+  lines.push(`**Time taken:** ${formatTime(data.timeTakenSeconds)}`)
   lines.push('')
   data.questions.forEach((q, i) => {
     const st = statusOf(q)
@@ -129,7 +112,7 @@ export function buildOrg(data: ExportData): string {
   lines.push(`#+TITLE: ${data.title}`)
   lines.push('')
   lines.push(`* Score: ${data.correct}/${data.total} (${percent(data)}%)`)
-  lines.push(`* Time taken: ${fmtTime(data.timeTakenSeconds)}`)
+  lines.push(`* Time taken: ${formatTime(data.timeTakenSeconds)}`)
   lines.push('')
   data.questions.forEach((q, i) => {
     const st = statusOf(q)
@@ -189,14 +172,10 @@ h1 { font-size: 1.5em; }
 </head>
 <body>
 <h1>${escapeHtml(data.title)} — Results</h1>
-<div class="score">Score: ${data.correct}/${data.total} (${percent(data)}%) &nbsp;·&nbsp; Time: ${fmtTime(data.timeTakenSeconds)}</div>
+<div class="score">Score: ${data.correct}/${data.total} (${percent(data)}%) &nbsp;·&nbsp; Time: ${formatTime(data.timeTakenSeconds)}</div>
 ${body}
 </body>
 </html>`
-}
-
-function escapeHtml(s: string): string {
-  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 }
 
 function escapeCss(s: string): string {

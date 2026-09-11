@@ -25,7 +25,6 @@ export interface QuizResult {
 
 export interface AppSettings {
   theme: 'light' | 'dark'
-  instantFeedback: boolean
   randomizeOptions: boolean
   randomizeQuestionOrder: boolean
 }

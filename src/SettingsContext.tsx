@@ -5,7 +5,6 @@ const SETTINGS_KEY = 'mcq-settings.json'
 
 const DEFAULTS: AppSettings = {
   theme: 'dark',
-  instantFeedback: false,
   randomizeOptions: true,
   randomizeQuestionOrder: true
 }

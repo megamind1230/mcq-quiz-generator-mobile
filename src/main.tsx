@@ -1,4 +1,4 @@
-import React from 'react'
+import { StrictMode } from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App'
 import { SettingsProvider } from './SettingsContext'
@@ -7,9 +7,9 @@ import 'highlight.js/styles/github-dark.css'
 import './styles.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
+  <StrictMode>
     <SettingsProvider>
       <App />
     </SettingsProvider>
-  </React.StrictMode>
+  </StrictMode>
 )

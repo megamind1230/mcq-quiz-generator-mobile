@@ -62,6 +62,12 @@ body {
   color: var(--amber);
 }
 
+.topbar-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
 .theme-toggle {
   background: transparent;
   border: 1px solid var(--border);
@@ -174,16 +180,6 @@ body {
   font-size: 1.1em;
 }
 
-.clear-btn {
-  background: transparent;
-  border: 1px solid var(--border);
-  color: var(--text-dim);
-  border-radius: 6px;
-  padding: 4px 10px;
-  cursor: pointer;
-  font-size: 13px;
-}
-
 .empty {
   color: var(--text-dim);
   font-size: 14px;
@@ -260,8 +256,8 @@ body {
 
 .tag-multi {
   color: #fff;
-  background: #6a5acd;
-  border: 1px solid #6a5acd;
+  background: var(--accent);
+  border: 1px solid var(--accent);
 }
 
 .quiz-hint {
@@ -305,7 +301,7 @@ body {
 
 .option-card .label {
   font-weight: 600;
-  color: #7C0AED;
+  color: var(--accent);
   margin-right: 4px;
 }
 
@@ -362,10 +358,11 @@ body {
   font-weight: 600;
 }
 
-.secondary {
-  background: transparent !important;
-  border: 1px solid var(--border) !important;
-  color: var(--text-dim) !important;
+.quiz-nav .secondary,
+.results-actions .secondary {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
 }
 
 .leave-btn {
@@ -462,7 +459,7 @@ body {
 }
 
 .inline-code {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--border);
   padding: 2px 6px;
   border-radius: 4px;
   font-family: 'Fira Code', monospace;
@@ -474,7 +471,7 @@ body {
 }
 
 .code-block {
-  background: #0d1117;
+  background: var(--bg);
   border: 1px solid var(--border);
   border-radius: 6px;
   padding: 12px;
@@ -513,6 +510,12 @@ body {
 .tag-loop {
   color: var(--success);
   border: 1px solid var(--success);
+  margin-left: 6px;
+}
+
+.tag-instant {
+  color: var(--accent);
+  border: 1px solid var(--accent);
   margin-left: 6px;
 }
 

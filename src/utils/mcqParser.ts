@@ -86,8 +86,6 @@ function parseQuestionBlock(block: string): McqQuestion | null {
 
     if (inExplanation) {
       explanationLines.push(line)
-    } else if (currentOption >= 0 && options.length <= currentOption) {
-      options[currentOption] += '\n' + line
     } else if (questionLines.length > 0 || line.trim()) {
       questionLines.push(line)
     }

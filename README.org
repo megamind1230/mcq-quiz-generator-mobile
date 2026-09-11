@@ -32,12 +32,15 @@ an API key, or network access after first load.
     - *Single answer:* radio markers (=●=/=○=), "Single answer" tag
     - *Multi answer:* checkbox markers (=☑=/=☐=), "Select all that apply"
       tag and a hint; graded by exact match (all-or-nothing)
-  - *Mode picker:* after selecting a file, choose *Loop Mode* (retakes wrong
-    answers in batches of 15 until all mastered; instant feedback forced on;
-    no results page) or *Normal Mode* (standard quiz with results page)
+  - *Mode picker:* after selecting a file, choose from three modes:
+    - *Loop Mode:* instant feedback, retakes wrong answers in batches of 15
+      until all mastered, no results page
+    - *Instant Mode:* instant feedback on every answer, no results page
+    - *Classic Mode:* no instant feedback (deferred to results), full results
+      summary at the end with per-question review
   - Count-up timer
-  - Instant feedback toggle (show correct/wrong on click, or only at results;
-    forced on in Loop Mode)
+  - Answer locking: in Loop and Instant modes, once an answer is submitted it
+    cannot be changed (prevents cheating)
   - Optional options shuffle and question-order shuffle (settings)
   - Explanation display after each answer
   - Next / Previous navigation
@@ -50,9 +53,9 @@ an API key, or network access after first load.
   - Percentage score with color coding (green/orange/red)
   - Per-question review: *Your Answer(s) ==>* / *Correct Answer(s) ==>* with
     ✅/❌ (green/red) and full Explanation
-  - Results logged to =localStorage= per device
+  - Only Classic mode saves results to history and shows the results page
+  - Loop and Instant modes return to the home screen when finished
   - History list on the Home screen with title, score, time, and date
-  - Clear-all-history option
 
 ** Export
   - =Export PDF= button -- opens a self-contained HTML result page and calls
@@ -123,7 +126,6 @@ an API key, or network access after first load.
   | Setting               | Default | Purpose                             |
   |-----------------------+---------+-------------------------------------|
   | Theme                 | dark    | Dark / light mode                   |
-  | Instant Feedback      | off     | Show correct/wrong on click (forced on in Loop Mode) |
   | Randomize Options     | on      | Shuffle option order each quiz      |
   | Randomize Q Order     | on      | Shuffle question order each quiz    |
 
@@ -202,24 +204,25 @@ an API key, or network access after first load.
   ├── public/
   │   └── icons/            # PWA icons (32/180/192/512 PNG)
   ├── src/
-  │   ├── App.tsx                # Root component, topbar + theme toggle + gear
-  │   ├── SettingsContext.tsx    # localStorage settings context
-  │   ├── main.tsx               # Entry: KaTeX/hljs CSS + SettingsProvider
-  │   ├── types.ts               # Shared types (McqDocument, McqQuestion, ...)
-  │   ├── styles.css             # Quiz theme / layout CSS
-  │   ├── components/
-  │   │   ├── QuizView.tsx       # Home, OpenExam, active quiz, results, PDF
-  │   │   └── SettingsPanel.tsx  # Settings modal (gear button overlay)
-  │   ├── lib/
-  │   │   └── crypto.ts          # WebCrypto AES-GCM .emcq decrypt
-  │   ├── utils/
-  │   │   ├── cssAssets.ts       # Inlined KaTeX/hljs CSS for exports
-  │   │   ├── mcqParser.ts       # .mcq text -> McqDocument
-  │   │   ├── quizModes.ts      # Loop mode logic + grading
-  │   │   ├── quizExporter.ts    # results -> HTML/TXT/MD/Org
-  │   │   ├── quizLogger.ts      # localStorage result history
-  │   │   ├── renderRichText.ts  # KaTeX + highlight.js rendering
-  │   │   └── shuffle.ts         # Fisher-Yates shuffle
+   │   ├── App.tsx                # Root component, topbar + theme toggle + gear
+   │   ├── SettingsContext.tsx    # localStorage settings context
+   │   ├── main.tsx               # Entry: KaTeX/hljs CSS + SettingsProvider
+   │   ├── types.ts               # Shared types (McqDocument, McqQuestion, ...)
+   │   ├── styles.css             # Quiz theme / layout CSS
+   │   ├── components/
+   │   │   ├── QuizView.tsx       # Home, OpenExam, active quiz, results, PDF
+   │   │   └── SettingsPanel.tsx  # Settings modal (gear button overlay)
+   │   ├── lib/
+   │   │   └── crypto.ts          # WebCrypto AES-GCM .emcq decrypt
+   │   ├── utils/
+   │   │   ├── cssAssets.ts       # Inlined KaTeX/hljs CSS for exports
+   │   │   ├── format.ts          # Shared: formatTime, escapeHtml, LABELS
+   │   │   ├── mcqParser.ts       # .mcq text -> McqDocument
+   │   │   ├── quizModes.ts      # Loop mode logic + grading + QuizMode type
+   │   │   ├── quizExporter.ts    # results -> HTML/TXT/MD/Org
+   │   │   ├── quizLogger.ts      # localStorage result history
+   │   │   ├── renderRichText.ts  # KaTeX + highlight.js rendering
+   │   │   └── shuffle.ts         # Fisher-Yates shuffle
   │   └── __tests__/              # Unit tests + fixture .mcq/.emcq
   ├── vite.config.ts        # Vite + PWA manifest config
   ├── tsconfig.json / tsconfig.node.json
