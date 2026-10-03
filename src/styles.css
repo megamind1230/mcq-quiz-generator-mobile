@@ -503,6 +503,10 @@ body {
   font-size: 0.9em;
 }
 
+.katex-display {
+  overflow-x: auto;
+}
+
 .inline-math {
   cursor: pointer;
 }

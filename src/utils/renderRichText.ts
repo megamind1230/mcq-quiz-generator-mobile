@@ -81,8 +81,8 @@ export function renderRichText(text: string): string {
   })
 
   s = escapeHtml(s)
-  s = s.replace(/\x00(\d+)\x00/g, (_, i) => placeholders[Number(i)])
   s = s.replace(/\n/g, '<br>')
+  s = s.replace(/\x00(\d+)\x00/g, (_, i) => placeholders[Number(i)])
 
   return s
 }
