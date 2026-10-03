@@ -535,6 +535,41 @@ body {
   font-size: 11px;
   padding: 2px 8px;
   cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+
+.rich-block:hover .copy-btn,
+.copy-btn:focus-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.copy-btn:hover {
+  color: var(--text);
+  border-color: var(--text-dim);
+}
+
+/* ── Copy confirmation toast ──────────────────────────────── */
+
+.copy-toast {
+  position: absolute;
+  padding: 2px 8px;
+  border: 1px solid var(--success);
+  border-radius: 5px;
+  background: var(--surface);
+  color: var(--success);
+  font-size: 11px;
+  pointer-events: none;
+  z-index: 20;
+  animation: copy-toast-fade 1.2s ease forwards;
+}
+
+@keyframes copy-toast-fade {
+  0% { opacity: 1; transform: translateY(0); }
+  55% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-4px); }
 }
 
 @media (max-width: 480px) {

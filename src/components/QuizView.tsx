@@ -13,6 +13,21 @@ import type { McqDocument, McqQuestion, QuizResult } from '../types'
 
 type QuizState = 'home' | 'active' | 'results'
 
+function showCopyToast(anchor: HTMLElement): void {
+  const block = anchor.closest('.rich-block')
+  if (!block) return
+  document.querySelectorAll('.copy-toast').forEach(node => node.remove())
+  const rect = block.getBoundingClientRect()
+  const toast = document.createElement('span')
+  toast.className = 'copy-toast'
+  toast.setAttribute('role', 'status')
+  toast.textContent = 'Copied!'
+  toast.style.top = `${rect.top + window.scrollY + 6}px`
+  toast.style.left = `${rect.left + window.scrollX + 6}px`
+  toast.addEventListener('animationend', () => toast.remove())
+  document.body.appendChild(toast)
+}
+
 export default function QuizView() {
   const { settings } = useSettings()
   const [state, setState] = useState<QuizState>('home')
@@ -262,11 +277,7 @@ export default function QuizView() {
       const raw = getRawContent(id)
       if (!raw) return
       navigator.clipboard.writeText(raw)
-      if (target.classList.contains('copy-btn')) {
-        const prev = target.textContent
-        target.textContent = 'Copied!'
-        setTimeout(() => { target.textContent = prev }, 1000)
-      }
+      if (target.classList.contains('copy-btn')) showCopyToast(target)
     }
     document.addEventListener('click', handler)
     return () => document.removeEventListener('click', handler)
