@@ -21,7 +21,7 @@ function showCopyToast(anchor: HTMLElement): void {
   const toast = document.createElement('span')
   toast.className = 'copy-toast'
   toast.setAttribute('role', 'status')
-  toast.textContent = 'Copied!'
+  toast.textContent = 'copied'
   toast.style.top = `${rect.top + window.scrollY + 6}px`
   toast.style.left = `${rect.left + window.scrollX + 6}px`
   toast.addEventListener('animationend', () => toast.remove())
@@ -273,14 +273,15 @@ export default function QuizView() {
       const el = e.target as HTMLElement
       const target = el.closest('[data-copy-id]') as HTMLElement | null
       if (!target) return
+      e.stopPropagation()
       const id = target.getAttribute('data-copy-id')!
       const raw = getRawContent(id)
       if (!raw) return
       navigator.clipboard.writeText(raw)
       if (target.classList.contains('copy-btn')) showCopyToast(target)
     }
-    document.addEventListener('click', handler)
-    return () => document.removeEventListener('click', handler)
+    document.addEventListener('click', handler, true)
+    return () => document.removeEventListener('click', handler, true)
   }, [state])
 
   // ── Keyboard shortcuts ───────────────────────────────────────
@@ -459,7 +460,7 @@ export default function QuizView() {
               cls += ' selected'
             }
             return (
-              <button key={i} className={cls} onClick={() => selectAnswer(i)} disabled={instant && answered}>
+              <button key={i} className={cls} onClick={() => selectAnswer(i)} aria-disabled={instant && answered}>
                 <span className="marker">{multi ? (isSelected ? '☑' : '☐') : (isSelected ? '●' : '○')}</span>
                 <span className="label">{LABELS[i]}.</span>{' '}
                 <span dangerouslySetInnerHTML={{ __html: renderRichText(opt) }} />

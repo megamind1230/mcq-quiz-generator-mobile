@@ -342,6 +342,10 @@ body {
   margin-right: 4px;
 }
 
+.option-card[aria-disabled='true'] {
+  cursor: default;
+}
+
 .option-card .marker {
   display: inline-block;
   width: 1.2em;
